@@ -1,6 +1,6 @@
-const User = require('./models/User');
+const User = require('../models/User');
 
-let auth = (req, res, next) => {
+module.exports = async function (req, res, next) {
     let token = req.cookies.auth;
     User.findByToken(token, (err, user) => {
         if (err) throw err;
@@ -13,5 +13,3 @@ let auth = (req, res, next) => {
         next();
     })
 }
-
-module.exports = {auth};
