@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true, useUnifiedTopo
 })
 
 app.get('/', function (req, res) {
-    res.status(200).send(`Welcome to login , sign-up api`);
+    res.status(200).send(`Welcome to server api`);
 });
 
 const port = process.env.PORT || 5000;
