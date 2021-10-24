@@ -1,19 +1,18 @@
-const express = require('express');
 const User = require('../models/User');
 
-exports.register = async (req, res)=> {
+exports.register = async (req, res) => {
     const newUser = new User(req.body);
     console.log(newUser)
 
     if (newUser.password !== newUser.password_repeat) return res.status(400).json({message: "passwords don't match"});
 
     User.findOne({email: newUser.email}, function (err, user) {
-        if (user) return res.status(400).json({auth: false, message: "email exits"});
+        if (user) return res.status(400).json({auth: false, message: "Email already used"});
 
         newUser.save((err, doc) => {
             if (err) {
                 console.log(err);
-                return res.status(400).json({success: false});
+                return res.status(400).json({success: false, message: err});
             }
             res.status(200).json({
                 success: true,
@@ -23,28 +22,30 @@ exports.register = async (req, res)=> {
     });
 }
 
-exports.login = async (req, res)=> {
+exports.login = async (req, res) => {
     let token = req.cookies.auth;
     User.findByToken(token, (err, user) => {
         if (err) return res(err);
-        if (user) return res.status(400).json({
-            error: true,
-            message: "You are already logged in"
+        if (user) return res.status(200).json({
+            error: false,
+            message: "You are already logged in",
+            token: token,
         });
 
         else {
             User.findOne({'email': req.body.email}, function (err, user) {
-                if (!user) return res.json({isAuth: false, message: ' Auth failed, email not found'});
+                if (!user) return res.json({isAuth: false, message: 'Auth failed, email not found'});
 
                 user.comparePassword(req.body.password, (err, isMatch) => {
-                    if (!isMatch) return res.json({isAuth: false, message: "passwords does match"});
+                    if (!isMatch) return res.json({isAuth: false, message: "Passwords don't match"});
 
                     user.generateToken((err, user) => {
                         if (err) return res.status(400).send(err);
                         res.cookie('auth', user.token).json({
                             isAuth: true,
-                            id: user._id
-                            , email: user.email
+                            id: user._id,
+                            email: user.email,
+                            token: token
                         });
                     });
                 });
@@ -53,7 +54,7 @@ exports.login = async (req, res)=> {
     });
 }
 
-exports.profile = async (req, res)=> {
+exports.profile = async (req, res) => {
     res.json({
         isAuth: true,
         id: req.user._id,
@@ -62,14 +63,14 @@ exports.profile = async (req, res)=> {
     })
 }
 
-exports.logout = async (req, res)=> {
+exports.logout = async (req, res) => {
     req.user.deleteToken(req.token, (err, user) => {
         if (err) return res.status(400).send(err);
         res.sendStatus(200);
     });
 }
 
-exports.getAllUsers = async (req, res)=> {
+exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find();
         res.json(users)
@@ -78,7 +79,7 @@ exports.getAllUsers = async (req, res)=> {
     }
 }
 
-exports.addUser = async (req, res)=> {
+exports.addUser = async (req, res) => {
     const {
         username,
         firstname,
@@ -114,7 +115,7 @@ exports.addUser = async (req, res)=> {
     }
 }
 
-exports.getUserById = async (req, res)=> {
+exports.getUserById = async (req, res) => {
     try {
         const findUser = await User.findById(req.params.userId);
         res.json(findUser)
@@ -123,7 +124,7 @@ exports.getUserById = async (req, res)=> {
     }
 }
 
-exports.deleteUser = async (req, res)=> {
+exports.deleteUser = async (req, res) => {
     try {
         const deleteUser = await User.deleteOne({_id: req.params.userId});
         if (deleteUser) {
@@ -135,7 +136,7 @@ exports.deleteUser = async (req, res)=> {
     }
 }
 
-exports.updateUser = async (req, res)=> {
+exports.updateUser = async (req, res) => {
     const {username, model_id, printed} = req.body;
     try {
         const updateUser = await User.updateOne({_id: req.params.userId}, {
