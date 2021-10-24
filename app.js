@@ -7,6 +7,8 @@ const userRoute = require('./routes/user');
 const modelRoute = require('./routes/model');
 const cors = require('cors')
 require('dotenv/config');
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger_output.json')
 
 //Middlewares
 app.use(cors());
@@ -23,7 +25,7 @@ const {routes} = require('./routes');
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true}, () => {
     console.log('db connected');
 })
-
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 app.get('/', function (req, res) {
     res.status(200).send(`Welcome to server api`);
 });
