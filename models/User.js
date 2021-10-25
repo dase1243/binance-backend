@@ -55,7 +55,7 @@ userSchema.pre('save', function (next) {
             bcrypt.hash(user.password, salt, function (err, hash) {
                 if (err) return next(err);
                 user.password = hash;
-                user.password2 = hash;
+                user.password_repeat = hash;
                 next();
             })
 

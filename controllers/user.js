@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
     const newUser = new User(req.body);
+    console.log("newUser: ", newUser);
 
     if (newUser.password !== newUser.password_repeat)
         return res.status(403).json({message: "Passwords are not the same", severity: 'error'});
@@ -18,7 +19,8 @@ exports.register = async (req, res) => {
             }
             res.status(200).json({
                 success: true,
-                user: doc
+                user: doc,
+                message: "success"
             });
         });
     });
@@ -55,7 +57,7 @@ exports.login = async (req, res) => {
             createdAt: user.createdAt,
         };
 
-        jwt.sign(payload, `${JWT_SECRET}`, {expiresIn: '3600m'}, async (err, token) => {
+        jwt.sign(payload, `${process.env.JWT_SECRET}`, {expiresIn: '3600m'}, async (err, token) => {
             if (err) {
                 throw err;
             }
@@ -71,11 +73,11 @@ exports.login = async (req, res) => {
                 secure: true, // must be true if sameSite='none'
             });
 
-            res.json({userData, expiresTime: String(Number(expires))});
+            res.json({userData, token, isAuth: true, expiresTime: String(Number(expires))});
         });
     } catch (error) {
         console.warn(error);
-        res.status(500).json({errors: {msg: 'Server error', severity: 'error'}});
+        res.status(500).json({errors: {msg: 'Server error', severity: 'error'}, isAuth: false});
     }
 }
 
