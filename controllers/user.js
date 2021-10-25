@@ -1,10 +1,12 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
     const newUser = new User(req.body);
-    console.log(newUser)
 
-    if (newUser.password !== newUser.password_repeat) return res.status(400).json({message: "passwords don't match"});
+    if (newUser.password !== newUser.password_repeat)
+        return res.status(403).json({message: "Passwords are not the same", severity: 'error'});
 
     User.findOne({email: newUser.email}, function (err, user) {
         if (user) return res.status(400).json({auth: false, message: "Email already used"});
@@ -23,35 +25,58 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    let token = req.cookies.auth;
-    User.findByToken(token, (err, user) => {
-        if (err) return res(err);
-        if (user) return res.status(200).json({
-            error: false,
-            message: "You are already logged in",
-            token: token,
-        });
+    try {
+        const {email, password} = req.body;
 
-        else {
-            User.findOne({'email': req.body.email}, function (err, user) {
-                if (!user) return res.json({isAuth: false, message: 'Auth failed, email not found'});
+        const user = await User.findOne({email});
 
-                user.comparePassword(req.body.password, (err, isMatch) => {
-                    if (!isMatch) return res.json({isAuth: false, message: "Passwords don't match"});
-
-                    user.generateToken((err, user) => {
-                        if (err) return res.status(400).send(err);
-                        res.cookie('auth', user.token).json({
-                            isAuth: true,
-                            id: user._id,
-                            email: user.email,
-                            token: token
-                        });
-                    });
-                });
-            });
+        if (!user) {
+            return res.status(400).json({errors: {msg: 'Invalid Credentials', severity: 'error'}});
         }
-    });
+
+        const isMatch = await bcrypt.compare(password, String(user.password));
+
+        if (!isMatch) {
+            return res.status(400).json({errors: {msg: 'Invalid Credentials', severity: 'error'}});
+        }
+
+        const payload = {
+            user: {
+                id: user.id,
+            },
+        };
+
+        const userData = {
+            _id: user.id,
+            username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            createdAt: user.createdAt,
+        };
+
+        jwt.sign(payload, `${JWT_SECRET}`, {expiresIn: '3600m'}, async (err, token) => {
+            if (err) {
+                throw err;
+            }
+
+            const dateNow = Date.now();
+            const expires = new Date(dateNow + 1000 * 60 * 3600);
+
+            res.cookie('token', token, {
+                expires,
+                httpOnly: true,
+                // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // must be 'none' to enable cross-site delivery
+                sameSite: 'none', // must be 'none' to enable cross-site delivery
+                secure: true, // must be true if sameSite='none'
+            });
+
+            res.json({userData, expiresTime: String(Number(expires))});
+        });
+    } catch (error) {
+        console.warn(error);
+        res.status(500).json({errors: {msg: 'Server error', severity: 'error'}});
+    }
 }
 
 exports.profile = async (req, res) => {
@@ -64,10 +89,22 @@ exports.profile = async (req, res) => {
 }
 
 exports.logout = async (req, res) => {
-    req.user.deleteToken(req.token, (err, user) => {
-        if (err) return res.status(400).send(err);
-        res.sendStatus(200);
-    });
+    const {expires} = req.query;
+
+    try {
+        res.clearCookie('token', {
+            expires: new Date(Number(expires)),
+            httpOnly: true,
+            // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // must be 'none' to enable cross-site delivery
+            sameSite: 'none', // must be 'none' to enable cross-site delivery
+            secure: true, // must be true if sameSite='none'
+        });
+
+        res.json({msg: 'Successfully logout'});
+    } catch (error) {
+        console.warn(error);
+        res.status(500).json({errors: {msg: 'Server error', severity: 'error'}});
+    }
 }
 
 exports.getAllUsers = async (req, res) => {

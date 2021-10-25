@@ -1,6 +1,9 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
-module.exports = async function (req, res, next) {
+const {JWT_SECRET} = process.env;
+
+exports.auth = async function (req, res, next) {
     let token = req.cookies.auth;
     User.findByToken(token, (err, user) => {
         if (err) throw err;
@@ -13,3 +16,23 @@ module.exports = async function (req, res, next) {
         next();
     })
 }
+
+exports.cookieJwtAuth = async (req, res, next) => {
+    const {token} = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({errors: {msg: 'No token, authorization denied', severity: 'error'}});
+    }
+
+    try {
+        const decoded = jwt.verify(token, `${JWT_SECRET}`);
+
+        req.user = (decoded).user;
+
+        next();
+    } catch (error) {
+        res.clearCookie('token');
+
+        res.status(401).json({errors: {msg: 'Token is not valid', severity: 'error'}});
+    }
+};
