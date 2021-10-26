@@ -3,24 +3,43 @@ const jwt = require('jsonwebtoken');
 
 const {JWT_SECRET} = process.env;
 
+// exports.auth = async function (req, res, next) {
+//     const unity_password = req.body.unity_password;
+//
+//     console.log(unity_password)
+//     if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
+//         next()
+//     } else {
+//         console.log('here')
+//         let token = req.cookies.auth;
+//         console.log('token', token)
+//         User.findByToken(token, (err, user) => {
+//             if (err) throw err;
+//             if (!user) return res.json({
+//                 error: true,
+//                 message: "Auth failed"
+//             });
+//
+//             req.token = token;
+//             req.user = user;
+//             next();
+//         })
+//     }
+// }
+
 exports.auth = async function (req, res, next) {
-    const unity_password = req.body.unity_password;
+    let token = req.cookies.auth;
+    User.findByToken(token, (err, user) => {
+        if (err) throw err;
+        if (!user) return res.json({
+            error: true,
+            message: "Auth failed"
+        });
 
-    if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
-        next()
-    } else {
-        let token = req.cookies.auth;
-        User.findByToken(token, (err, user) => {
-            if (err) throw err;
-            if (!user) return res.json({
-                error: true
-            });
-
-            req.token = token;
-            req.user = user;
-            next();
-        })
-    }
+        req.token = token;
+        req.user = user;
+        next();
+    })
 }
 
 exports.cookieJwtAuth = async (req, res, next) => {
