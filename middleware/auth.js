@@ -4,17 +4,23 @@ const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = process.env;
 
 exports.auth = async function (req, res, next) {
-    let token = req.cookies.auth;
-    User.findByToken(token, (err, user) => {
-        if (err) throw err;
-        if (!user) return res.json({
-            error: true
-        });
+    const unity_password = req.body.unity_password;
 
-        req.token = token;
-        req.user = user;
-        next();
-    })
+    if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
+        next()
+    } else {
+        let token = req.cookies.auth;
+        User.findByToken(token, (err, user) => {
+            if (err) throw err;
+            if (!user) return res.json({
+                error: true
+            });
+
+            req.token = token;
+            req.user = user;
+            next();
+        })
+    }
 }
 
 exports.cookieJwtAuth = async (req, res, next) => {

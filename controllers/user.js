@@ -157,9 +157,20 @@ exports.addUser = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const findUser = await User.findById(req.params.userId);
-        res.json(findUser)
+        res.status(200).json(findUser)
     } catch (err) {
-        res.json({message: err})
+        res.status(400).json({message: err})
+    }
+}
+
+exports.getUserByEmail = async (req, res) => {
+    console.log('here too')
+    try {
+        const findUser = await User.findOne({email: req.params.email});
+        return res.status(200).json(findUser);
+    } catch (err) {
+        console.log(err)
+        return res.json({message: err})
     }
 }
 
@@ -176,11 +187,11 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-    const {username, model_id, printed} = req.body;
+    const {email, model_id, printed} = req.body;
     try {
         const updateUser = await User.updateOne({_id: req.params.userId}, {
             $set: {
-                username: username,
+                username: email,
                 model_id: model_id,
                 printed: printed
             }
@@ -188,6 +199,23 @@ exports.updateUser = async (req, res) => {
         if (updateUser) {
             const users = await User.find();
             res.json(users)
+        }
+    } catch (err) {
+        res.json({message: err})
+    }
+}
+
+exports.updateUserModel = async (req, res) => {
+    const {model} = req.body;
+    try {
+        const updateUser = await User.updateOne({_id: req.params.userId}, {
+            $set: {
+                model_id: model,
+            }
+        });
+        if (updateUser) {
+            const user = await User.findOne({_id: req.params.userId});
+            res.status(200).json(user)
         }
     } catch (err) {
         res.json({message: err})

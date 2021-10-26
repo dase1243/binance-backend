@@ -10,9 +10,13 @@ router.post('/addUser', auth, user.addUser)
 
 router.get('/:userId', auth, user.getUserById)
 
+router.post('/:email', auth, user.getUserByEmail)
+
 router.delete('/deleteUser/:userId', auth, user.deleteUser)
 
 router.patch('/updateUser/:userId', auth, user.updateUser)
+
+router.patch('/updateUserModel/:userId', auth, user.updateUserModel)
 
 router.post('/register', user.register);
 
