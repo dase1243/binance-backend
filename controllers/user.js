@@ -186,17 +186,17 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-    const {email, model_id, printed} = req.body;
+    console.log('here')
+    const {email, model_id} = req.body;
     try {
         const updateUser = await User.updateOne({_id: req.params.userId}, {
             $set: {
                 username: email,
-                model_id: model_id,
-                printed: printed
+                model_id: model_id
             }
         });
         if (updateUser) {
-            const users = await User.find();
+            const users = await User.findOne({_id: req.params.userId});
             res.json(users)
         }
     } catch (err) {

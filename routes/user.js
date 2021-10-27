@@ -18,9 +18,9 @@ router.post('/:email', auth, user.getUserByEmail)
 
 router.delete('/deleteUser/:userId', auth, user.deleteUser)
 
-router.patch('/updateUser/:userId', auth, user.updateUser)
+router.post('/updateUser/:userId', auth, user.updateUser)
 
-router.patch('/updateUserModel/:userId', auth, user.updateUserModel)
+router.post('/updateUserModel/:userId', auth, user.updateUserModel)
 
 router.get('/profile', auth, user.profile);
 
