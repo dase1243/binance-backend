@@ -2,8 +2,8 @@ const userRoutes = require('./user');
 const modelRoutes = require('./model');
 
 function routes(app) {
-  app.use('/api', userRoutes);
-  app.use('/api', modelRoutes);
+  app.use('/api/user', userRoutes);
+  app.use('/api/model/', modelRoutes);
 }
 
 module.exports = { routes };

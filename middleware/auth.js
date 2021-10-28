@@ -10,7 +10,7 @@ exports.auth = async function (req, res, next) {
         next()
     } else {
         let token = req.cookies.auth;
-        User.findByToken(token, (err, user) => {
+        User.findOne({token}, (err, user) => {
             if (err) throw err;
             if (!user) return res.json({
                 error: true,

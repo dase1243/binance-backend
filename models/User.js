@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const Schema = mongoose.Schema;
 const salt = 10;
 
 const userSchema = mongoose.Schema({
@@ -32,17 +32,14 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    token: {
-        type: String
-    },
-    model_id: {
+    walletAddress: {
         type: String,
-        required: true
+        required: true,
     },
-    printed: {
-        type: Boolean,
-        required: true
-    }
+    models: {
+        type: Schema.Types.ObjectId,
+        ref: "Model"
+    },
 }, {timestamps: {createdAt: 'created_at'}});
 
 userSchema.pre('save', function (next) {
@@ -64,41 +61,5 @@ userSchema.pre('save', function (next) {
         next();
     }
 });
-
-userSchema.methods.comparePassword = function (password, cb) {
-    bcrypt.compare(password, this.password, function (err, isMatch) {
-        if (err) return cb(next);
-        cb(null, isMatch);
-    });
-}
-
-userSchema.methods.generateToken = function (cb) {
-    const user = this;
-    user.token = jwt.sign(user._id.toHexString(), process.env.SECRET);
-    user.save(function (err, user) {
-        if (err) return cb(err);
-        cb(null, user);
-    })
-}
-
-userSchema.statics.findByToken = function (token, cb) {
-    const user = this;
-
-    jwt.verify(token, process.env.SECRET, function (err, decode) {
-        user.findOne({"_id": decode, "token": token}, function (err, user) {
-            if (err) return cb(err);
-            cb(null, user);
-        })
-    })
-};
-
-userSchema.methods.deleteToken = function (token, cb) {
-    const user = this;
-
-    user.update({$unset: {token: 1}}, function (err, user) {
-        if (err) return cb(err);
-        cb(null, user);
-    })
-}
 
 module.exports = mongoose.model('User', userSchema);

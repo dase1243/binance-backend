@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
         newUser.save((err, doc) => {
             if (err) {
                 console.log(err);
-                return res.status(400).json({success: false, message: err});
+                return res.status(400).json({success: false, message: "Invalid inputs"});
             }
             res.status(200).json({
                 success: true,
@@ -32,13 +32,13 @@ exports.login = async (req, res) => {
         const user = await User.findOne({email});
 
         if (!user) {
-            return res.status(400).json({errors: {msg: 'Invalid Credentials', severity: 'error'}});
+            return res.status(400).json({isAuth: false, message: 'Invalid Credentials'});
         }
 
         const isMatch = await bcrypt.compare(password, String(user.password));
 
         if (!isMatch) {
-            return res.status(400).json({errors: {msg: 'Invalid Credentials', severity: 'error'}});
+            return res.status(400).json({isAuth: false, message: 'Invalid Credentials'});
         }
 
         const payload = {
@@ -104,7 +104,7 @@ exports.logout = async (req, res) => {
         res.json({msg: 'Successfully logout'});
     } catch (error) {
         console.warn(error);
-        res.status(500).json({errors: {msg: 'Server error', severity: 'error'}});
+        return next(ApiError.internal('Server error'))
     }
 }
 
@@ -124,22 +124,16 @@ exports.addUser = async (req, res) => {
         lastname,
         email,
         password,
-        password_repeat,
-        token,
         model_id,
-        printed
     } = req.body;
 
     const user = new User({
-        username: username,
-        firstname: firstname,
-        lastname: lastname,
-        email: email,
-        password: password,
-        password_repeat: password_repeat,
-        token: token,
-        model_id: model_id,
-        printed: printed
+        username,
+        firstname,
+        lastname,
+        email,
+        password,
+        model_id,
     });
 
     try {
@@ -186,18 +180,17 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-    console.log('here')
-    const {email, model_id} = req.body;
+    const {userId} = req.params.id;
     try {
-        const updateUser = await User.updateOne({_id: req.params.userId}, {
-            $set: {
-                username: email,
-                model_id: model_id
+        const updateUser = await User.updateOne(
+            {userId},
+            {
+                $set: req.body
             }
-        });
+        );
         if (updateUser) {
-            const users = await User.findOne({_id: req.params.userId});
-            res.json(users)
+            const user = await User.findOne({_id: req.params.userId});
+            res.json(user)
         }
     } catch (err) {
         res.json({message: err})

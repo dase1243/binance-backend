@@ -1,11 +1,37 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const modelSchema = mongoose.Schema({
-    name:{
+const Model = mongoose.Schema({
+    name: {
         type: String,
         required: true
+    },
+    image: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    token: {
+        type: String,
+        required: true
+    },
+    unityGameModel: {
+        type: String,
+        required: true
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    printed: {
+        type: Boolean,
+        required: true
     }
-    
-}, { timestamps: { createdAt: 'created_at' } });
 
-module.exports = mongoose.model('Models', modelSchema);
+}, {timestamps: {createdAt: 'created_at'}});
+
+module.exports = mongoose.model('Model', Model);

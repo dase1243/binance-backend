@@ -1,69 +1,16 @@
 const express = require('express');
-const Model = require('../models/Model');
-const User = require('../models/User');
+const model = require('../controllers/model')
 const router = express.Router();
+const {auth} = require('../middleware/auth');
 
-router.get('/getModel', async (req, res) => {
-    try {
-        const Models = await Model.find();
-        res.json(Models)
-    } catch (err) {
-        res.json({message: err})
-    }
-})
+router.post('/getAll', auth, model.getAll);
 
-router.get('/getOneModel/:modelId', async (req, res) => {
-    try {
-        const findModel = await Model.findById(req.params.modelId);
-        res.json(findModel)
-    } catch (err) {
-        res.json({message: err})
-    }
-})
+router.post('/getById/:_id', auth, model.getById);
 
-router.post('/addModel', async (req, res) => {
+router.get('/getByUserId/:userId', auth, model.getByUserId)
 
-    const model = new Model({
-        name: req.body.name,
-    });
+router.post('/create/:userId', auth, model.create)
 
-    try {
-        const savedModel = await model.save();
-        if (savedModel) {
-            const Models = await Model.find();
-            res.json(Models)
-        }
-    } catch (err) {
-        res.json({message: err})
-    }
-})
-
-
-router.post('/deleteModel', async (req, res) => {
-    const {id} = req.body;
-    try {
-        const deleteModel = await Model.deleteOne({_id: id});
-        const deleteTodos = await User.deleteMany({model_id: id});
-
-        if (deleteModel && deleteTodos) {
-            const Models = await Model.find();
-            res.json(Models)
-        }
-    } catch (err) {
-        res.json({message: err})
-    }
-})
-
-router.patch('/updateModel/:modelId', async (req, res) => {
-    try {
-        const updateModel = await Model.updateOne({_id: req.params.modelId}, {$set: {name: req.body.name}});
-        if (updateModel) {
-            const Models = await Model.find();
-            res.json(Models)
-        }
-    } catch (err) {
-        res.json({message: err})
-    }
-})
+router.post('/update', auth, model.update)
 
 module.exports = router;
