@@ -5,6 +5,8 @@ const {auth} = require('../middleware/auth');
 
 router.post('/getAll', auth, model.getAll);
 
+router.get('/getSmartContractInfo/:modelId', model.getAll);
+
 router.post('/getById/:_id', auth, model.getById);
 
 router.get('/getByUserId/:userId', auth, model.getByUserId)

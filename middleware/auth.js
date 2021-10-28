@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 
 const {JWT_SECRET} = process.env;
 
+//todo
+// https://javascript.plainenglish.io/parsing-post-data-3-different-ways-in-node-js-e39d9d11ba8
+
 exports.auth = async function (req, res, next) {
     const unity_password = req.body.unity_password;
 
