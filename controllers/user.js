@@ -149,7 +149,7 @@ exports.addUser = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
     try {
-        const findUser = await User.findById(req.params.userId);
+        const findUser = await User.findById(req.params.userId).populate('models');
         res.status(200).json(findUser)
     } catch (err) {
         res.status(400).json({message: err})

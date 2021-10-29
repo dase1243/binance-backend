@@ -69,7 +69,7 @@ exports.uploadTokenImage = async (req, res) => {
         console.log('req: ', req)
         console.log('req.body: ', req.body)
         console.log('req.params: ', req.params)
-        var buf = new Buffer(req.body.toString('binary'),'binary');
+        var buf = new Buffer(req.body.toString('binary'), 'binary');
         // const {userId} = req.params;
         // const user = await User.findOne({_id: userId})
         const fileName = saveFile(req.files.image);
@@ -92,9 +92,21 @@ exports.uploadTokenImage = async (req, res) => {
 }
 
 exports.getByUserId = async (req, res) => {
-    const userId = req.params.userId;
-    const user = res.json(await User.findOne({_id: userId}));
-    return user.models;
+    console.log('req.params: ', req.params)
+    const {userId} = req.params;
+    const user = await User.findOne({_id: userId}).populate('Model');
+
+    if (!user) {
+        return res.status(400).json({success: false, message: "No user with such id"});
+    }
+
+    const model = await Model.findOne({user: user._id})
+
+    if (!model) {
+        return res.status(400).json({success: false, message: "No models for such user"});
+    }
+
+    return res.json(model);
 }
 
 exports.update = async (req, res) => {

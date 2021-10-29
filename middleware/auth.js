@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = process.env;
 
 exports.auth = async function (req, res, next) {
-    console.log('here')
     try {
         const unity_password = req.body.unity_password;
 
