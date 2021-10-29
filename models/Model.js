@@ -8,6 +8,7 @@ const Model = mongoose.Schema({
     },
     image: {
         type: String,
+        data: Buffer,
         required: true
     },
     description: {
