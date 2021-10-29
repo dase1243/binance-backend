@@ -66,8 +66,10 @@ exports.create = async (req, res) => {
 
 exports.uploadTokenImage = async (req, res) => {
     try {
+        console.log('req: ', req)
         console.log('req.body: ', req.body)
         console.log('req.params: ', req.params)
+        var buf = new Buffer(req.body.toString('binary'),'binary');
         // const {userId} = req.params;
         // const user = await User.findOne({_id: userId})
         const fileName = saveFile(req.files.image);
