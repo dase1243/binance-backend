@@ -1,5 +1,7 @@
 const Model = require('../models/Model');
 const User = require('../models/User');
+const uuid = require("uuid");
+const path = require('path')
 
 exports.getAll = async (req, res) => {
     return res.json(await Model.find())
@@ -21,7 +23,7 @@ exports.getById = async (req, res) => {
 
 const saveFile = (file) => {
     try {
-        const fileName = uuid.v4() + '.jpg';
+        const fileName = uuid.v4() + path.extname(file.name);
         const filePath = path.resolve('static', fileName);
         file.mv(filePath);
         return fileName;
@@ -32,14 +34,13 @@ const saveFile = (file) => {
 
 exports.create = async (req, res) => {
     try {
-        console.log('here')
         const {userId} = req.params;
-        console.log(req.body)
         const user = await User.findOne({_id: userId})
         const fileName = saveFile(req.files.image);
 
         let model = await Model.create({
             ...req.body,
+            name: req.body.name.split(' ').join('_'),
             image: fileName,
             user
         });

@@ -3,27 +3,28 @@ const jwt = require('jsonwebtoken');
 
 const {JWT_SECRET} = process.env;
 
-//todo
-// https://javascript.plainenglish.io/parsing-post-data-3-different-ways-in-node-js-e39d9d11ba8
-
 exports.auth = async function (req, res, next) {
-    const unity_password = req.body.unity_password;
+    try {
+        const unity_password = req.body.unity_password;
 
-    if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
-        next()
-    } else {
-        let token = req.cookies.auth;
-        User.findOne({token}, (err, user) => {
-            if (err) throw err;
-            if (!user) return res.json({
-                error: true,
-                message: "Auth failed"
-            });
+        if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
+            next()
+        } else {
+            let token = req.cookies.auth;
+            User.findOne({token}, (err, user) => {
+                if (err) throw err;
+                if (!user) return res.json({
+                    error: true,
+                    message: "Auth failed"
+                });
 
-            req.token = token;
-            req.user = user;
-            next();
-        })
+                req.token = token;
+                req.user = user;
+                next();
+            })
+        }
+    } catch (e) {
+        res.json(JSON.stringify(e))
     }
 }
 
