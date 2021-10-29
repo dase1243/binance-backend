@@ -92,7 +92,7 @@ exports.uploadTokenImage = async (req, res) => {
 }
 
 exports.getByUserId = async (req, res) => {
-    const {userId} = req.params.userId;
+    const userId = req.params.userId;
     const user = res.json(await User.findOne({_id: userId}));
     return user.models;
 }
