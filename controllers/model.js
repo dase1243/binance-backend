@@ -43,8 +43,11 @@ const saveFile = (file) => {
 
 exports.create = async (req, res) => {
     try {
+        console.log("req.params: ", req.params)
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
+
+        console.log("user: ", user)
         const fileName = saveFile(req.files.image);
 
         let model = await Model.create({
@@ -53,6 +56,8 @@ exports.create = async (req, res) => {
             image: fileName,
             user
         });
+
+        console.log("model: ", model)
 
         return res.json(model)
     } catch (e) {
@@ -66,10 +71,6 @@ exports.create = async (req, res) => {
 
 exports.uploadTokenImage = async (req, res) => {
     try {
-        console.log('req: ', req)
-        console.log('req.body: ', req.body)
-        console.log('req.params: ', req.params)
-        var buf = new Buffer(req.body.toString('binary'), 'binary');
         // const {userId} = req.params;
         // const user = await User.findOne({_id: userId})
         const fileName = saveFile(req.files.image);
@@ -107,6 +108,23 @@ exports.getByUserId = async (req, res) => {
     }
 
     return res.json(model);
+}
+
+exports.getModelIdByUserId = async (req, res) => {
+    const {userId} = req.params;
+    const user = await User.findOne({_id: userId}).populate('Model');
+
+    if (!user) {
+        return res.status(400).json({success: false, message: "No user with such id"});
+    }
+
+    const model = await Model.findOne({user: user._id})
+
+    if (!model) {
+        return res.status(400).json({success: false, message: "No models for such user"});
+    }
+
+    return res.json(model._id);
 }
 
 exports.update = async (req, res) => {

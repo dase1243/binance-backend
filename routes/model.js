@@ -11,6 +11,8 @@ router.get('/getById/:modelId', auth, model.getById);
 
 router.get('/getByUserId/:userId', auth, model.getByUserId)
 
+router.get('/getModelIdByUserId/:userId', auth, model.getModelIdByUserId)
+
 router.post('/create/:userId', auth, model.create)
 
 router.post('/uploadTokenImage/:userId', auth, model.uploadTokenImage)
