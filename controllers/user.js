@@ -157,9 +157,12 @@ exports.getUserById = async (req, res) => {
 }
 
 exports.getUserByEmail = async (req, res) => {
-    console.log('here too')
     try {
         const findUser = await User.findOne({email: req.params.email});
+        if(!findUser) {
+            return res.status(400).json({success: false, message: "No user with such email"});
+        }
+
         return res.status(200).json(findUser);
     } catch (err) {
         console.log(err)

@@ -14,7 +14,7 @@ router.post('/addUser', auth, user.addUser)
 
 router.get('/getUserById/:userId', auth, user.getUserById)
 
-router.post('/:email', auth, user.getUserByEmail)
+router.get('/getUserByEmail/:email', auth, user.getUserByEmail)
 
 router.delete('/deleteUser/:userId', auth, user.deleteUser)
 
