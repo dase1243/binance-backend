@@ -180,7 +180,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-    const {userId} = req.params.id;
+    const userId = req.params.id;
     try {
         const updateUser = await User.updateOne(
             {userId},
