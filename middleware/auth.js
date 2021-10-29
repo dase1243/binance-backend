@@ -4,13 +4,16 @@ const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = process.env;
 
 exports.auth = async function (req, res, next) {
+    console.log('here')
     try {
         const unity_password = req.body.unity_password;
 
+        console.log(unity_password)
         if (unity_password && unity_password === process.env.UNITY_PASSWORD) {
             next()
         } else {
             let token = req.cookies.auth;
+            console.log(token)
             User.findOne({token}, (err, user) => {
                 if (err) throw err;
                 if (!user) return res.json({
@@ -24,6 +27,7 @@ exports.auth = async function (req, res, next) {
             })
         }
     } catch (e) {
+        console.log('error')
         res.json(JSON.stringify(e))
     }
 }

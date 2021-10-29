@@ -64,6 +64,31 @@ exports.create = async (req, res) => {
     }
 }
 
+exports.uploadTokenImage = async (req, res) => {
+    try {
+        console.log('req.body: ', req.body)
+        console.log('req.params: ', req.params)
+        // const {userId} = req.params;
+        // const user = await User.findOne({_id: userId})
+        const fileName = saveFile(req.files.image);
+
+        // let model = await Model.create({
+        //     ...req.body,
+        //     name: req.body.name.split(' ').join('_'),
+        //     image: fileName,
+        //     user
+        // });
+
+        return res.json({success: true})
+    } catch (e) {
+        console.log(e)
+        return res.json({
+            error: true,
+            message: e
+        })
+    }
+}
+
 exports.getByUserId = async (req, res) => {
     const {userId} = req.params.userId;
     const user = res.json(await User.findOne({_id: userId}));
