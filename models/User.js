@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 const salt = 10;
 
-const userSchema = mongoose.Schema({
+const User = mongoose.Schema({
     username: {
         type: String,
         required: true
@@ -42,7 +42,7 @@ const userSchema = mongoose.Schema({
     },
 }, {timestamps: {createdAt: 'created_at'}});
 
-userSchema.pre('save', function (next) {
+User.pre('save', function (next) {
     const user = this;
 
     if (user.isModified('password')) {
@@ -62,4 +62,4 @@ userSchema.pre('save', function (next) {
     }
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', User);

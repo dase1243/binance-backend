@@ -9,6 +9,9 @@ exports.getAll = async (req, res) => {
 
 exports.getSmartContractInfo = async (req, res) => {
     const model = await Model.findOne({_id: req.params.modelId});
+    if (!model) {
+        return res.status(400).json({success: false, message: "No model with such id"});
+    }
     return res.json({
         image: process.env.URL + "/modelImages/" + model.image,
         description: model.description,
@@ -17,8 +20,14 @@ exports.getSmartContractInfo = async (req, res) => {
 }
 
 exports.getById = async (req, res) => {
-    const {_id} = req.params.modelId;
-    return res.json(await Model.findOne({_id}))
+    const _id = req.params.modelId;
+
+    let model = await Model.findOne({_id}).populate("user");
+    if (!model) {
+        return res.status(400).json({success: false, message: "No model with such id"});
+    }
+
+    return res.json({model, success: true})
 }
 
 const saveFile = (file) => {
@@ -47,6 +56,7 @@ exports.create = async (req, res) => {
 
         return res.json(model)
     } catch (e) {
+        console.log(e)
         return res.json({
             error: true,
             message: e

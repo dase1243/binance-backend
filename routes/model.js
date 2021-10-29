@@ -3,11 +3,11 @@ const model = require('../controllers/model')
 const router = express.Router();
 const {auth} = require('../middleware/auth');
 
-router.post('/getAll', auth, model.getAll);
+router.get('/getAll', auth, model.getAll);
 
 router.get('/getSmartContractInfo/:modelId', model.getSmartContractInfo);
 
-router.post('/getById/:_id', auth, model.getById);
+router.get('/getById/:modelId', auth, model.getById);
 
 router.get('/getByUserId/:userId', auth, model.getByUserId)
 
