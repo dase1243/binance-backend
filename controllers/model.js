@@ -33,7 +33,7 @@ exports.getById = async (req, res) => {
 
 const saveFile = (file, filename) => {
     try {
-        const fileName = filename + path.extname(file.name);
+        const fileName = filename + ".png";
         if (!fs.existsSync(path.resolve('static'))) {
             fs.mkdirSync('static');
         }
