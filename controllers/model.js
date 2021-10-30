@@ -53,7 +53,7 @@ exports.create = async (req, res) => {
 
         const fileName = saveFile(req.files.image);
 
-        const bitmap = fs.readFileSync(fileName);
+        const bitmap = fs.readFileSync(path.resolve('static', fileName));
 
         let model = await Model.create({
             ...req.body,
