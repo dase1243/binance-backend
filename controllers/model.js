@@ -2,6 +2,7 @@ const Model = require('../models/Model');
 const User = require('../models/User');
 const uuid = require("uuid");
 const path = require('path')
+const fs = require('fs');
 
 exports.getAll = async (req, res) => {
     return res.json(await Model.find())
@@ -46,20 +47,19 @@ exports.create = async (req, res) => {
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
-        // console.log("user: ", user)
-        // console.log("req.files: ", req.files)
-        // console.log("req.params: ", req.params.image)
+        console.log("user: ", user)
+        console.log("req.files: ", req.files)
 
-        // const fileName = saveFile(req.params.image);
+        const fileName = saveFile(req.params.image);
+
+        const bitmap = fs.readFileSync(fileName);
 
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: req.params.image,
+            image: new Buffer(bitmap).toString('base64'),
             user
         });
-
-        console.log("model: ", model)
 
         return res.json(model)
     } catch (e) {
