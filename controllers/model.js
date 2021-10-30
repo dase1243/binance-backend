@@ -34,6 +34,9 @@ exports.getById = async (req, res) => {
 const saveFile = (file) => {
     try {
         const fileName = uuid.v4() + path.extname(file.name);
+        if (!fs.existsSync(path.resolve('static'))){
+            fs.mkdirSync('static');
+        }
         const filePath = path.resolve('static', fileName);
         file.mv(filePath);
         return fileName;
@@ -47,16 +50,12 @@ exports.create = async (req, res) => {
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
-        console.log("user: ", user)
-        console.log("req.files: ", req.files)
-        console.log("req.body: ", req.body)
-
         const fileName = saveFile(req.files.image);
 
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: req.files.image,
+            image: fileName,
             user
         });
 
