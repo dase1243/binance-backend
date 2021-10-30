@@ -6,7 +6,12 @@ const Model = mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
+    base_image: {
+        type: String,
+        data: Buffer,
+        required: true
+    },
+    nft_image: {
         type: String,
         data: Buffer,
         required: true

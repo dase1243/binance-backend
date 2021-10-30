@@ -65,7 +65,7 @@ async function getByteArray(filePath) {
     return result;
 }
 
-async function storeImageAtFireStorage(fileName, model) {
+async function storeImageAtFireStorage(fileName) {
     const storage = getStorage(firebaseApp, "gs://binance-hack-c03b1");
     console.log('storage is created')
 
@@ -87,28 +87,21 @@ async function storeImageAtFireStorage(fileName, model) {
                 console.log(`Image ${fileName} is uploaded!`);
             })
 
-        await getDownloadURL(ref(storage, fileName))
+        return await getDownloadURL(ref(storage, fileName))
             .then(async (url) => {
                 console.log(`Image Download URL ${url} is generated!`);
-                model.image = url
-
-                console.log('Model after fileStorage: ', model)
-
+                return url
             })
             .catch((error) => {
                 console.log(error)
             });
-
-        await model.save();
-        return model
-
     } catch (e) {
         console.log(`Image ${fileName} wasn\'t uploaded! Upload had error ${e}`);
         throw Error(e);
     }
 }
 
-exports.create = async (req, res) => {
+exports.createWithBaseImage = async (req, res) => {
     try {
         console.log('Inside create')
         const {userId} = req.params;
@@ -117,11 +110,29 @@ exports.create = async (req, res) => {
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: 'empty',
+            base_image: 'empty',
+            nft_image: 'empty',
             user
         });
 
-        return res.json(model)
+        try {
+            let fileName = await saveFile(req.files.image, model._id);
+
+            model.base_image = await storeImageAtFireStorage(fileName)
+
+            console.log('Model after fileStorage: ', model)
+
+            await model.save();
+
+            return res.json({model, success: true})
+        } catch (e) {
+            console.log("Couldn't store file at Fire Storage")
+            model.remove()
+            return res.json({
+                error: true,
+                message: e
+            })
+        }
     } catch (e) {
         console.log(e)
         return res.json({
@@ -131,7 +142,7 @@ exports.create = async (req, res) => {
     }
 }
 
-exports.uploadTokenImage = async (req, res) => {
+exports.uploadNftTokenImage = async (req, res) => {
     const {modelId} = req.params;
 
     const model = await Model.findOne({_id: modelId})
@@ -144,9 +155,13 @@ exports.uploadTokenImage = async (req, res) => {
         let fileName = await saveFile(req.files.image, modelId);
 
         try {
-            const updatedModel = await storeImageAtFireStorage(fileName, model)
+            model.nft_image = await storeImageAtFireStorage(fileName)
 
-            return res.json({updatedModel, success: true})
+            console.log('Model after fileStorage: ', model)
+
+            await model.save();
+
+            return res.json({model, success: true})
         } catch (e) {
             console.log("Couldn't store file at Fire Storage")
             model.remove()

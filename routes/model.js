@@ -15,9 +15,9 @@ router.get('/getModelIdByUserId/:userId', auth, model.getModelIdByUserId)
 
 router.get('/getModelByUserId/:userId', auth, model.getModelByUserId)
 
-router.post('/create/:userId', auth, model.create)
+router.post('/create/:userId', auth, model.createWithBaseImage)
 
-router.post('/uploadTokenImage/:modelId', auth, model.uploadTokenImage)
+router.post('/uploadTokenImage/:modelId', auth, model.uploadNftTokenImage)
 
 router.post('/update', auth, model.update)
 
