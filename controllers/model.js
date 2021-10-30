@@ -124,7 +124,7 @@ exports.createWithBaseImage = async (req, res) => {
 
             await model.save();
 
-            return res.json({model, success: true})
+            return res.json(model)
         } catch (e) {
             console.log("Couldn't store file at Fire Storage")
             model.remove()
@@ -161,7 +161,7 @@ exports.uploadNftTokenImage = async (req, res) => {
 
             await model.save();
 
-            return res.json({model, success: true})
+            return res.json(model)
         } catch (e) {
             console.log("Couldn't store file at Fire Storage")
             model.remove()
