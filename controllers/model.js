@@ -31,10 +31,10 @@ exports.getById = async (req, res) => {
     return res.json({model, success: true})
 }
 
-const saveFile = (file) => {
+const saveFile = (file, filename) => {
     try {
-        const fileName = uuid.v4() + path.extname(file.name);
-        if (!fs.existsSync(path.resolve('static'))){
+        const fileName = filename + path.extname(file.name);
+        if (!fs.existsSync(path.resolve('static'))) {
             fs.mkdirSync('static');
         }
         const filePath = path.resolve('static', fileName);
@@ -50,14 +50,15 @@ exports.create = async (req, res) => {
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
-        const fileName = saveFile(req.files.image);
-
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: fileName,
+            image: 'empty',
             user
         });
+
+        model.image = saveFile(req.files.image, model._id)
+        await model.save();
 
         return res.json(model)
     } catch (e) {
