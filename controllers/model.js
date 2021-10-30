@@ -127,6 +127,23 @@ exports.getModelIdByUserId = async (req, res) => {
     return res.json(model._id);
 }
 
+exports.getModelByUserId = async (req, res) => {
+    const {userId} = req.params;
+    const user = await User.findOne({_id: userId});
+
+    if (!user) {
+        return res.status(400).json({success: false, message: "No user with such id"});
+    }
+
+    const model = await Model.findOne({user: user._id})
+
+    if (!model) {
+        return res.status(400).json({success: false, message: "No models for such user"});
+    }
+
+    return res.json(model);
+}
+
 exports.update = async (req, res) => {
     const {_id} = req.params.id;
     try {

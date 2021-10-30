@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const moralis = require('moralis/node');
 
 exports.register = async (req, res) => {
     const newUser = new User(req.body);
@@ -89,6 +90,38 @@ exports.profile = async (req, res) => {
     })
 }
 
+exports.getAllNftsByUserId = async (req, res) => {
+    const findUser = await User.findById(req.params.userId).populate('models');
+
+    if (!findUser) {
+        return res.status(400).json({success: false, message: "No user with such email"});
+    }
+
+    const nftAddress = process.env.NFT_CONTRACT_ADDR;
+
+    const bscNFTs = await getNfts(findUser.walletAddress, nftAddress);
+
+    res.json(bscNFTs)
+}
+
+exports.getAllNftsByUserEmail = async (req, res) => {
+    const findUser = await User.findOne({email: req.params.userEmail}).populate('models');
+    if (!findUser) {
+        return res.status(400).json({success: false, message: "No user with such email"});
+    }
+
+    const nftAddress = process.env.NFT_CONTRACT_ADDR;
+
+    const bscNFTs = await getNfts(findUser.walletAddress, nftAddress);
+
+    res.json(bscNFTs)
+}
+
+async function getNfts(playerAddr, nftContractAddr) {
+    const options = { chain: 'bsc testnet', address: playerAddr, token_address: nftContractAddr };
+    return await moralis.Web3API.account.getNFTsForContract(options);
+}
+
 exports.logout = async (req, res) => {
     const {expires} = req.query;
 
@@ -150,6 +183,11 @@ exports.addUser = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const findUser = await User.findById(req.params.userId).populate('models');
+
+        if (!findUser) {
+            return res.status(400).json({success: false, message: "No user with such id"});
+        }
+
         res.status(200).json(findUser)
     } catch (err) {
         res.status(400).json({message: err})
@@ -159,7 +197,7 @@ exports.getUserById = async (req, res) => {
 exports.getUserByEmail = async (req, res) => {
     try {
         const findUser = await User.findOne({email: req.params.email});
-        if(!findUser) {
+        if (!findUser) {
             return res.status(400).json({success: false, message: "No user with such email"});
         }
 

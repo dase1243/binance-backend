@@ -10,6 +10,12 @@ require('dotenv/config');
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger_output.json')
 const fileUpload = require('express-fileupload')
+const moralis = require('moralis/node');
+
+const serverUrl = process.env.MORALIS_SERVER_URL;
+const appId = process.env.MORALIS_APP_ID;
+
+moralis.start({serverUrl, appId});
 
 //Middlewares
 app.use(cors());
