@@ -53,12 +53,10 @@ exports.create = async (req, res) => {
 
         const fileName = saveFile(req.files.image);
 
-        const bitmap = fs.readFileSync(path.resolve('static', fileName));
-
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: new Buffer(bitmap).toString('base64'),
+            image: req.files.image,
             user
         });
 
