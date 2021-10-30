@@ -124,7 +124,7 @@ exports.getModelIdByUserId = async (req, res) => {
         return res.status(400).json({success: false, message: "No models for such user"});
     }
 
-    return res.json(model._id);
+    return res.json({modelId: model._id});
 }
 
 exports.getModelByUserId = async (req, res) => {
