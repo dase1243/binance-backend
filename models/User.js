@@ -40,6 +40,10 @@ const User = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Model"
     },
+    tokenAmount: {
+        type: Schema.Types.INTEGER,
+        default: 0
+    },
 }, {timestamps: {createdAt: 'created_at'}});
 
 User.pre('save', function (next) {

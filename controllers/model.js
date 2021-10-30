@@ -43,20 +43,19 @@ const saveFile = (file) => {
 
 exports.create = async (req, res) => {
     try {
-        console.log("req.params: ", req.params)
-        console.log("req.params: ", req.body)
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
-        console.log("user: ", user)
-        console.log("req.files: ", req.files)
+        // console.log("user: ", user)
+        // console.log("req.files: ", req.files)
+        // console.log("req.params: ", req.params.image)
 
-        const fileName = saveFile(req.files.image);
+        // const fileName = saveFile(req.params.image);
 
         let model = await Model.create({
             ...req.body,
             name: req.body.name.split(' ').join('_'),
-            image: fileName,
+            image: req.params.image,
             user
         });
 
