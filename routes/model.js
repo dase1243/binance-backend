@@ -13,7 +13,7 @@ router.get('/getByUserId/:userId', auth, model.getByUserId)
 
 router.get('/getModelIdByUserId/:userId', auth, model.getModelIdByUserId)
 
-router.get('/getModelByUserId/:userId', auth, model.getModelIdByUserId)
+router.get('/getModelByUserId/:userId', auth, model.getModelByUserId)
 
 router.post('/create/:userId', auth, model.create)
 

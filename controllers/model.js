@@ -128,6 +128,7 @@ exports.getModelIdByUserId = async (req, res) => {
 }
 
 exports.getModelByUserId = async (req, res) => {
+    console.log('here')
     const {userId} = req.params;
     const user = await User.findOne({_id: userId});
 
