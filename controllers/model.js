@@ -49,6 +49,7 @@ exports.create = async (req, res) => {
 
         console.log("user: ", user)
         console.log("req.files: ", req.files)
+        console.log("req.body: ", req.body)
 
         const fileName = saveFile(req.params.image);
 
