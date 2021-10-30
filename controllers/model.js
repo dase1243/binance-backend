@@ -51,7 +51,7 @@ exports.create = async (req, res) => {
         console.log("req.files: ", req.files)
         console.log("req.body: ", req.body)
 
-        const fileName = saveFile(req.params.image);
+        const fileName = saveFile(req.files.image);
 
         const bitmap = fs.readFileSync(fileName);
 
