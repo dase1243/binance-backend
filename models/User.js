@@ -36,13 +36,13 @@ const User = mongoose.Schema({
         type: String,
         required: true,
     },
+    tokenAmount: {
+        type: Number,
+        default: 0
+    },
     models: {
         type: Schema.Types.ObjectId,
         ref: "Model"
-    },
-    tokenAmount: {
-        type: Schema.Types.INTEGER,
-        default: 0
     },
 }, {timestamps: {createdAt: 'created_at'}});
 
