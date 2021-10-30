@@ -1,8 +1,20 @@
 const Model = require('../models/Model');
 const User = require('../models/User');
-const uuid = require("uuid");
 const path = require('path')
 const fs = require('fs');
+const {ref, getStorage, uploadBytes, getDownloadURL} = require("firebase/storage");
+const {initializeApp} = require("firebase/app");
+
+const firebaseConfig = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
 
 exports.getAll = async (req, res) => {
     return res.json(await Model.find())
@@ -31,22 +43,74 @@ exports.getById = async (req, res) => {
     return res.json({model, success: true})
 }
 
-const saveFile = (file, filename) => {
+const saveFile = async (file, filename) => {
     try {
         const fileName = filename + path.extname(file.name);
         if (!fs.existsSync(path.resolve('static'))) {
             fs.mkdirSync('static');
         }
         const filePath = path.resolve('static', fileName);
-        file.mv(filePath);
+        await file.mv(filePath);
         return fileName;
     } catch (e) {
         console.log(e)
     }
 }
 
+async function getByteArray(filePath) {
+    let fileData = await fs.readFileSync(filePath).toString('hex');
+    let result = []
+    for (let i = 0; i < fileData.length; i += 2)
+        result.push('0x' + fileData[i] + '' + fileData[i + 1])
+    return result;
+}
+
+async function storeImageAtFireStorage(fileName, model) {
+    const storage = getStorage(firebaseApp, "gs://binance-hack-c03b1");
+    console.log('storage is created')
+
+    console.log('fileName: ', fileName)
+    const tempImageStorage = ref(storage, fileName);
+    const metadata = {
+        contentType: `image/${path.extname(fileName)}`,
+    };
+
+    let filePath = path.resolve('static', fileName);
+    console.log('FilePath: ', filePath)
+
+    let byteArray = await getByteArray(filePath);
+    console.log('File converted to bytes')
+
+    try {
+        await uploadBytes(tempImageStorage, new Uint8Array(byteArray), metadata)
+            .then((snapshot) => {
+                console.log(`Image ${fileName} is uploaded!`);
+            })
+
+        await getDownloadURL(ref(storage, fileName))
+            .then(async (url) => {
+                console.log(`Image Download URL ${url} is generated!`);
+                model.image = url
+
+                console.log('Model after fileStorage: ', model)
+
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+
+        await model.save();
+        return model
+
+    } catch (e) {
+        console.log(`Image ${fileName} wasn\'t uploaded! Upload had error ${e}`);
+        throw Error(e);
+    }
+}
+
 exports.create = async (req, res) => {
     try {
+        console.log('Inside create')
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
@@ -56,9 +120,6 @@ exports.create = async (req, res) => {
             image: 'empty',
             user
         });
-
-        model.image = saveFile(req.files.image, model._id)
-        await model.save();
 
         return res.json(model)
     } catch (e) {
@@ -71,17 +132,29 @@ exports.create = async (req, res) => {
 }
 
 exports.uploadTokenImage = async (req, res) => {
-    try {
-        // const {userId} = req.params;
-        // const user = await User.findOne({_id: userId})
-        const fileName = saveFile(req.files.image);
+    const {modelId} = req.params;
 
-        // let model = await Model.create({
-        //     ...req.body,
-        //     name: req.body.name.split(' ').join('_'),
-        //     image: fileName,
-        //     user
-        // });
+    const model = await Model.findOne({_id: modelId})
+
+    if (!model) {
+        return res.status(400).json({success: false, message: "No models with such id"});
+    }
+
+    try {
+        let fileName = await saveFile(req.files.image, modelId);
+
+        try {
+            const updatedModel = await storeImageAtFireStorage(fileName, model)
+
+            return res.json({updatedModel, success: true})
+        } catch (e) {
+            console.log("Couldn't store file at Fire Storage")
+            model.remove()
+            return res.json({
+                error: true,
+                message: e
+            })
+        }
 
         return res.json({success: true})
     } catch (e) {
