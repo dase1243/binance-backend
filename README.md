@@ -61,9 +61,7 @@ This library is released under the [3-clause MIT License](LICENSE.md).
 
 ## Support
 
-Our developer support team is here to help you. Find out more information on our [Help Center](https://help.virgilsecurity.com/).
+Our developer support team is here to help you. Find out more information on our [Help Center](https://startblock.online/).
 
-You can find us on [Twitter](https://twitter.com/VirgilSecurity) or send us email support@VirgilSecurity.com.
-
-Also, get extra help from our support team on [Slack](https://virgilsecurity.com/join-community).
+You can find us on [Twitter](https://twitter.com/InfiniteHeroees) or send us email info@startblock.online.
 
