@@ -102,6 +102,7 @@ async function storeImageAtFireStorage(fileName) {
 }
 
 exports.createWithBaseImage = async (req, res) => {
+    console.log('Inside createWithBaseImage')
     try {
         console.log('Inside create')
         const {userId} = req.params;
@@ -174,7 +175,7 @@ exports.uploadNftTokenImage = async (req, res) => {
         try {
             model.nft_image = await storeImageAtFireStorage(fileName)
 
-            console.log('Model after fileStorage: ', model)
+            // console.log('Model after fileStorage: ', model)
 
             await model.save();
 
