@@ -130,7 +130,7 @@ exports.createWithBaseImage = async (req, res) => {
         });
 
         try {
-            let fileName = await saveFile(req.files.image, model._id);
+            let fileName = await saveFile(req.files.image, model._id + "-base");
 
             model.base_image = await storeImageAtFireStorage(fileName)
 
@@ -160,22 +160,21 @@ exports.uploadNftTokenImage = async (req, res) => {
     console.log('Inside uploadNftTokenImage')
     const {modelId} = req.params;
 
-    // console.log('modelId: ', modelId)
     const model = await Model.findOne({_id: modelId})
-
-    // console.log('model: ', model)
 
     if (!model) {
         return res.status(400).json({success: false, message: "No models with such id"});
     }
 
+
     try {
-        let fileName = await saveFile(req.files.image, modelId);
+        console.log('req.files.image: ', req.files.image)
+        let fileName = await saveFile(req.files.image, modelId + "-nft");
 
         try {
             model.nft_image = await storeImageAtFireStorage(fileName)
 
-            // console.log('Model after fileStorage: ', model)
+            console.log('Model after fileStorage: ', model)
 
             await model.save();
 
