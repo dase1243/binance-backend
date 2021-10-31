@@ -269,3 +269,24 @@ exports.update = async (req, res) => {
         res.json({message: err})
     }
 }
+
+exports.uploadModelPrintedStatus = async (req, res) => {
+    const {modelId} = req.params;
+    const {printed} = req.body;
+    try {
+        const model = await Model.findOne({_id: modelId})
+
+        if (!model) {
+            return res.status(400).json({success: false, message: "No models for such user"});
+        }
+
+        model.printed = printed;
+
+        model.save();
+
+        res.json(model)
+    } catch
+        (err) {
+        res.json({message: err})
+    }
+}

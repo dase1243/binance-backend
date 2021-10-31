@@ -105,6 +105,7 @@ exports.getAllNftsByUserId = async (req, res) => {
 }
 
 exports.getAllNftsByUserEmail = async (req, res) => {
+    console.log('Inside getAllNftsByUserEmail')
     const findUser = await User.findOne({email: req.params.userEmail}).populate('models');
     if (!findUser) {
         return res.status(400).json({success: false, message: "No user with such email"});

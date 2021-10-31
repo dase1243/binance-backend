@@ -19,6 +19,8 @@ router.post('/create/:userId', auth, model.createWithBaseImage)
 
 router.post('/uploadTokenImage/:modelId', auth, model.uploadNftTokenImage)
 
+router.post('/updateModelPrintedStatus/:modelId', auth, model.uploadModelPrintedStatus)
+
 router.post('/update', auth, model.update)
 
 module.exports = router;
