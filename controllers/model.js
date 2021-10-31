@@ -107,10 +107,10 @@ exports.createWithBaseImage = async (req, res) => {
         const {userId} = req.params;
         const user = await User.findOne({_id: userId})
 
-        console.log('user: ', user)
+        // console.log('user: ', user)
 
         const createdModels = await Model.find({user: user._id})
-        console.log('created models: ', createdModels)
+        // console.log('created models: ', createdModels)
 
         if (createdModels.length !== 0) {
             let modelCreated;
@@ -133,7 +133,7 @@ exports.createWithBaseImage = async (req, res) => {
 
             model.base_image = await storeImageAtFireStorage(fileName)
 
-            console.log('Model after fileStorage: ', model)
+            // console.log('Model after fileStorage: ', model)
 
             await model.save();
 
@@ -156,9 +156,13 @@ exports.createWithBaseImage = async (req, res) => {
 }
 
 exports.uploadNftTokenImage = async (req, res) => {
+    console.log('Inside uploadNftTokenImage')
     const {modelId} = req.params;
 
+    // console.log('modelId: ', modelId)
     const model = await Model.findOne({_id: modelId})
+
+    // console.log('model: ', model)
 
     if (!model) {
         return res.status(400).json({success: false, message: "No models with such id"});
@@ -183,8 +187,6 @@ exports.uploadNftTokenImage = async (req, res) => {
                 message: e
             })
         }
-
-        return res.json({success: true})
     } catch (e) {
         console.log(e)
         return res.json({
