@@ -26,7 +26,7 @@ exports.getSmartContractInfo = async (req, res) => {
         return res.status(400).json({success: false, message: "No model with such id"});
     }
     return res.json({
-        image: process.env.URL + "/modelImages/" + model.image,
+        image: model.base_image,
         description: model.description,
         name: model.name
     })
