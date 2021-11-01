@@ -20,18 +20,6 @@ exports.getAll = async (req, res) => {
     return res.json(await Model.find())
 }
 
-exports.getSmartContractInfo = async (req, res) => {
-    const model = await Model.findOne({_id: req.params.modelId});
-    if (!model) {
-        return res.status(400).json({success: false, message: "No model with such id"});
-    }
-    return res.json({
-        image: model.base_image,
-        description: model.description,
-        name: model.name
-    })
-}
-
 exports.getById = async (req, res) => {
     const _id = req.params.modelId;
 
