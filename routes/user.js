@@ -22,7 +22,7 @@ router.post('/updateUser/:userId', auth, user.updateUser)
 
 router.post('/updateUserModel/:userId', auth, user.updateUserModel)
 
-router.post('/updateUserTokenAmount/:userId', auth, user.updateUserModel)
+router.post('/updateUserTokenAmount/:userId', auth, user.updateUserTokenAmount)
 
 router.get('/profile', auth, user.profile);
 
