@@ -94,7 +94,7 @@ exports.getAllNftsByUserId = async (req, res) => {
     const findUser = await User.findById(req.params.userId).populate('models');
 
     if (!findUser) {
-        return res.status(400).json({success: false, message: "No user with such email"});
+        return res.status(400).json({success: false, message: "No user with such id"});
     }
 
     const nftAddress = process.env.NFT_CONTRACT_ADDR;
@@ -119,7 +119,7 @@ exports.getAllNftsByUserEmail = async (req, res) => {
 }
 
 async function getNfts(playerAddr, nftContractAddr) {
-    const options = { chain: 'bsc testnet', address: playerAddr, token_address: nftContractAddr };
+    const options = {chain: 'bsc testnet', address: playerAddr, token_address: nftContractAddr};
     return await moralis.Web3API.account.getNFTsForContract(options);
 }
 
@@ -251,6 +251,24 @@ exports.updateUserModel = async (req, res) => {
             const user = await User.findOne({_id: req.params.userId});
             res.status(200).json(user)
         }
+    } catch (err) {
+        res.json({message: err})
+    }
+}
+
+exports.updateUserTokenAmount = async (req, res) => {
+    const {tokenAmount} = req.body;
+
+    try {
+        const findUser = await User.findById(req.params.userId).populate('models');
+
+        if (!findUser) {
+            return res.status(400).json({success: false, message: "No user with such id"});
+        }
+
+        findUser.tokenAmount = tokenAmount;
+        findUser.save();
+        res.json(findUser);
     } catch (err) {
         res.json({message: err})
     }
