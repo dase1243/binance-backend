@@ -9,4 +9,8 @@ router.get('/getByModelId/:modelId', auth, nft_token.getByModelId)
 
 router.get('/getSmartContractInfo/:modelId', auth, nft_token.getSmartContractInfo);
 
+router.get('/getAllNftsByUserId/:userId', auth, nft_token.getAllNftsByUserId);
+
+router.get('/getAllNftsByUserEmail/:userEmail', auth, nft_token.getAllNftsByUserEmail);
+
 module.exports = router;

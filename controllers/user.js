@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const moralis = require('moralis/node');
 
 exports.register = async (req, res) => {
     const newUser = new User(req.body);
@@ -88,39 +87,6 @@ exports.profile = async (req, res) => {
         email: req.user.email,
         name: req.user.firstname + req.user.lastname
     })
-}
-
-exports.getAllNftsByUserId = async (req, res) => {
-    const findUser = await User.findById(req.params.userId).populate('models');
-
-    if (!findUser) {
-        return res.status(400).json({success: false, message: "No user with such id"});
-    }
-
-    const nftAddress = process.env.NFT_CONTRACT_ADDR;
-
-    const bscNFTs = await getNfts(findUser.walletAddress, nftAddress);
-
-    res.json(bscNFTs)
-}
-
-exports.getAllNftsByUserEmail = async (req, res) => {
-    console.log('Inside getAllNftsByUserEmail')
-    const findUser = await User.findOne({email: req.params.userEmail}).populate('models');
-    if (!findUser) {
-        return res.status(400).json({success: false, message: "No user with such email"});
-    }
-
-    const nftAddress = process.env.NFT_CONTRACT_ADDR;
-
-    const bscNFTs = await getNfts(findUser.walletAddress, nftAddress);
-
-    res.json(bscNFTs)
-}
-
-async function getNfts(playerAddr, nftContractAddr) {
-    const options = {chain: 'bsc testnet', address: playerAddr, token_address: nftContractAddr};
-    return await moralis.Web3API.account.getNFTsForContract(options);
 }
 
 exports.logout = async (req, res) => {
