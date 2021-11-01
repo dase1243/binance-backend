@@ -110,16 +110,17 @@ exports.createWithBaseImage = async (req, res) => {
 
         // console.log('user: ', user)
 
-        const createdModels = await Model.find({user: user._id})
-        // console.log('created models: ', createdModels)
-
-        if (createdModels.length !== 0) {
-            let modelCreated;
-            for (let i = 0; i < createdModels.length; i++) {
-                modelCreated = createdModels[i]
-                modelCreated.remove()
-            }
-        }
+        // for removing and replacing old ones
+        // const createdModels = await Model.find({user: user._id})
+        // // console.log('created models: ', createdModels)
+        //
+        // if (createdModels.length !== 0) {
+        //     let modelCreated;
+        //     for (let i = 0; i < createdModels.length; i++) {
+        //         modelCreated = createdModels[i]
+        //         modelCreated.remove()
+        //     }
+        // }
 
         let model = await Model.create({
             ...req.body,
