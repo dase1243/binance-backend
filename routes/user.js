@@ -22,12 +22,10 @@ router.post('/updateUser/:userId', auth, user.updateUser)
 
 router.post('/updateUserModel/:userId', auth, user.updateUserModel)
 
+router.post('/updateUserTokenAmount/:userId', auth, user.updateUserTokenAmount)
+
 router.get('/profile', auth, user.profile);
 
 router.get('/logout', auth, user.logout);
-
-router.get('/getAllNftsByUserId/:userId', auth, user.getAllNftsByUserId);
-
-router.get('/getAllNftsByUserEmail/:userEmail', auth, user.getAllNftsByUserEmail);
 
 module.exports = router;
